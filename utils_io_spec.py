@@ -1,4 +1,5 @@
 import requests
+import os
 from urllib.parse import urlencode
 def upload_files_services(supp_dict_dir = '/content/data/supp_dict'):
     base_url = 'https://cloud-api.yandex.net/v1/disk/public/resources/download?'
