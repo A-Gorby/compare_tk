@@ -1,0 +1,8 @@
+# torch
+# numpy
+pandas == 1.4.1
+xlrd == 2.0.1
+pyxlsb
+#scipy
+#tqdm
+openpyxl
