@@ -34,8 +34,22 @@ from openpyxl.utils import units
 from openpyxl.styles import Border, Side, PatternFill, GradientFill, Alignment
 from openpyxl import drawing
 
+import matplotlib.pyplot as plt
+# import seaborn as sns
+# %matplotlib inline
 from matplotlib.colors import ListedColormap, BoundaryNorm
 
+from utils_enrichment import preprocess_tkbd
+from utils_io import save_df_lst_to_excel
+from utils_io import logger
+
+if len(logger.handlers) > 1:
+    for handler in logger.handlers:
+        logger.removeHandler(handler)
+    from utils_io import logger
+
+from  local_dictionaries import sevice_sections, service_chapters, service_types_A, service_types_B, service_classes_A, service_classes_B
+from  local_dictionaries import dict_ath_anatomy, dict_ath_therapy, dict_ath_pharm, dict_ath_chemical
 
 def read_enriched_tk_data(path_tkbd_processed, fn_tk_bd):
     df_services = pd.read_excel(os.path.join(path_tkbd_processed, fn_tk_bd), sheet_name = 'Услуги')
@@ -219,6 +233,116 @@ def extract_names_from_code_service(code, debug=False):
     
     return section_name, type_name, class_name
 
+def services_comparison(
+    df_services, tk_names, model_names,
+    col_to_compare = 'Наименование услуги по Номенклатуре медицинских услуг (Приказ МЗ №804н)'):
+    
+    df1 = df_services[df_services['Файл Excel']==tk_names[0]]
+    df2 = df_services[df_services['Файл Excel']==tk_names[1]]
+    # print(df1.shape, df2.shape)
+    print(f"Количество услуг: {model_names[0]}: {df1.shape}, {model_names[1]}: {df2.shape}")
+    
+    services_df1 = df1[col_to_compare].unique()
+    services_df2 = df2[col_to_compare].unique()
+    print(f"Количество уникальных услуг: {model_names[0]}: {len(services_df1)}, {model_names[1]}: {len(services_df2)}")
+    
+    common_services = [s for s in services_df1 if s in services_df2] + [s for s in services_df2 if s in services_df1]
+    common_services = list(set(common_services))
+    print("Количество общих услуг", len(common_services))
+    
+    diff_services_1_f_2 = [s for s in services_df1 if s not in services_df2]
+    print(f"Количество отличающихся услуг: {model_names[0]}: {len(diff_services_1_f_2)}")
+    # print(f"{diff_services_1_f_2[:5]}")
+    diff_services_2_f_1 = [s for s in services_df2 if s not in services_df1]
+    print(f"Количество отличающихся услуг: {model_names[1]}: {len(diff_services_2_f_1)}")
+    # print(f"{diff_services_2_f_1[:5]}")
+    
+    df_common_services = pd.DataFrame([['Общие', s] for s in common_services], columns=['Тип сравнения', 'Услуга'])
+    # df_common_services.head(2)
+    # print(df_common_services.shape)
+    # pprint(diff_services_1_f_2)
+    df_diff_services_1_f_2 = pd.DataFrame([[f"Есть в '{model_names[0]}', нет в '{model_names[1]}'", s] 
+                                           for s in diff_services_1_f_2], columns=['Тип сравнения', 'Услуга'])
+    # df_diff_services_1_f_2.head(2)
+    df_diff_services_2_f_1 = pd.DataFrame([[f"Есть в '{model_names[1]}', нет в '{model_names[0]}'", s] 
+                                           for s in diff_services_2_f_1], columns=['Тип сравнения', 'Услуга'])
+    # df_diff_services_2_f_1.head(2)
+    # print(df_diff_services_2_f_1.shape)
+    df_services_compare = pd.concat([df_common_services, df_diff_services_1_f_2, df_diff_services_2_f_1])
+    print(f"Услуги: Итого строк сравнения: {df_services_compare.shape[0]}")
+    
+    return df_services_compare
+
+def LP_comparison(
+    df_LP, tk_names, model_names,
+    col_to_compare = 'Наименование лекарственного препарата (ЛП) (МНН)'):
+    df1 = df_LP[df_LP['Файл Excel']==tk_names[0]]
+    df2 = df_LP[df_LP['Файл Excel']==tk_names[1]]
+    # print(df1.shape, df2.shape)
+    print(f"Количество ЛП: {model_names[0]}: {df1.shape[0]}, {model_names[1]}: {df2.shape[0]}")
+    LP_df1 = df1[col_to_compare].unique()
+    LP_df2 = df2[col_to_compare].unique()
+    print(f"Количество уникальных ЛП: {model_names[0]}: {len(LP_df1)}, {model_names[1]}: {len(LP_df2)}")
+    
+    common_LP = [s for s in LP_df1 if s in LP_df2] + [s for s in LP_df2 if s in LP_df1]
+    common_LP = list(set(common_LP))
+    print(f"Количество общих ЛП: {len(common_LP)}")
+
+    diff_LP_1_f_2 = [s for s in LP_df1 if s not in LP_df2]
+    print(f"Количество отличающихся ЛП: {model_names[0]}: {len(diff_LP_1_f_2)}")
+    diff_LP_2_f_1 = [s for s in LP_df2 if s not in LP_df1]
+    print(f"Количество отличающихся ЛП: {model_names[1]}: {len(diff_LP_2_f_1)}")
+    
+    df_common_LP = pd.DataFrame([['Общие ЛП(МНН)', s] for s in common_LP], columns=['Тип сравнения', 'ЛП(МНН)'])
+    # df_common_LP.head(2)
+    # print(df_common_LP.shape)
+    # pprint(diff_services_1_f_2)
+    df_diff_LP_1_f_2 = pd.DataFrame([[f"Есть в '{model_names[0]}', нет в '{model_names[1]}'", s] 
+                                           for s in diff_LP_1_f_2], columns=['Тип сравнения', 'ЛП(МНН)'])
+    # df_diff_services_1_f_2.head(2)
+    df_diff_LP_2_f_1 = pd.DataFrame([[f"Есть в '{model_names[1]}', нет в '{model_names[0]}'", s] 
+                                           for s in diff_LP_2_f_1], columns=['Тип сравнения', 'ЛП(МНН)'])
+    
+    df_LP_compare = pd.concat([df_common_LP, df_diff_LP_1_f_2, df_diff_LP_2_f_1])
+    # print(df_LP_compare.shape)
+    print(f"ЛП: Итого строк сравнения: {df_LP_compare.shape[0]}")
+    
+    return df_LP_compare
+
+def RM_comparison(
+    df_RM, tk_names, model_names,
+    col_to_compare = 'Изделия медицинского назначения и расходные материалы, обязательно используемые при оказании медицинской услуги'):
+    
+    df1 = df_RM[df_RM['Файл Excel']==tk_names[0]]
+    df2 = df_RM[df_RM['Файл Excel']==tk_names[1]]
+    print(f"Количество МИ/РМ: {model_names[0]}: {df1.shape[0]}, {model_names[1]}: {df2.shape[0]}")
+    RM_df1 = df1[col_to_compare].unique()
+    RM_df2 = df2[col_to_compare].unique()
+    print(f"Количество уникальных МИ/РМ: {model_names[0]}: {len(RM_df1)}, {model_names[1]}: {len(RM_df2)}")
+    
+    common_RM = [s for s in RM_df1 if s in RM_df2] + [s for s in RM_df2 if s in RM_df1]
+    common_RM = list(set(common_RM))
+    print(f"Количество общих МИ/РМ: {len(common_RM)}")
+    
+    diff_RM_1_f_2 = [s for s in RM_df1 if s not in RM_df2]
+    print(f"Количество отличающихся МИ/РМ: {model_names[0]}: {len(diff_RM_1_f_2)}")
+    diff_RM_2_f_1 = [s for s in RM_df2 if s not in RM_df1]
+    print(f"Количество отличающихся МИ/РМ: {model_names[1]}: {len(diff_RM_2_f_1)}")
+    
+    df_common_RM = pd.DataFrame([['Общие МИ/РМ', s] for s in common_RM], columns=['Тип сравнения', 'МИ/РМ'])
+    df_diff_RM_1_f_2 = pd.DataFrame([[f"Есть в '{model_names[0]}', нет в '{model_names[1]}'", s] 
+                                           for s in diff_RM_1_f_2], columns=['Тип сравнения', 'МИ/РМ'])
+    # df_diff_services_1_f_2.head(2)
+    df_diff_RM_2_f_1 = pd.DataFrame([[f"Есть в '{model_names[1]}', нет в '{model_names[0]}'", s] 
+                                           for s in diff_RM_2_f_1], columns=['Тип сравнения', 'МИ/РМ'])
+    
+    df_RM_compare = pd.concat([df_common_RM, df_diff_RM_1_f_2, df_diff_RM_2_f_1])
+    # print(df_LP_compare.shape)
+    print(f"ЛП: Итого строк сравнения: {df_RM_compare.shape[0]}")
+    
+    return df_RM_compare
+
+
 def services_analysis(
     df_services, tk_names, model_names, tk_code_name,
     path_tk_models_processed
@@ -363,8 +487,8 @@ def services_analysis_02(
         # fn_img = f"{analysis_part_code:02d}_{analysis_part}_{i_col:02d}.jpg"
         fn_img = f"01_Услуги_{analysis_subpart_code:02d}_{analysis_subpart}_{i_col:02d}.jpg" #.replace(' ','_')
         
-        # plt.savefig(os.path.join(path_tk_models_processed, tk_code_name, fn_img), bbox_inches='tight')
-        plt.savefig(path_tk_models_processed + tk_code_name + '/' + fn_img, bbox_inches='tight')
+        plt.savefig(os.path.join(path_tk_models_processed, tk_code_name, fn_img), bbox_inches='tight')
+        # plt.savefig(path_tk_models_processed + tk_code_name + '/' + fn_img, bbox_inches='tight')
         plt.show()
         try:
             diff_df_services.append(def_differencies(
@@ -498,6 +622,7 @@ def LP_analysis_02(
     # colors=["#9b59b6", "#3498db", "#95a5a6", "#e74c3c", "#34495e", "#2ecc71"]
     cmap = ListedColormap(["#95a5a6", "#2ecc71"])
     y_lim_min = 0
+    diff_lst = []
     
     for i_col, col_name in enumerate(columns_to_compare):
         diff_lst.append([])
@@ -738,9 +863,9 @@ def data_comparsion (
         df_RM, tk_names, model_names,
         col_to_compare = 'Изделия медицинского назначения и расходные материалы, обязательно используемые при оказании медицинской услуги')
 
-    tk_save_dir = os.path.join(save_path, tk_code_name)
+    tk_save_dir = os.path.join(path_tk_models_processed, tk_code_name)
     if not os.path.exists(tk_save_dir): os.mkdir(tk_save_dir)
-    fn_TK_save = save_to_excel([df_services_compare, df_LP_compare, df_RM_compare], ['Услуги_Сравнение', 'ЛП_Сравнение', 'РМ_Сравнение'], tk_save_dir, tk_code_name + '.xlsx')
+    fn_TK_save = save_df_lst_to_excel([df_services_compare, df_LP_compare, df_RM_compare], ['Услуги_Сравнение', 'ЛП_Сравнение', 'РМ_Сравнение'], tk_save_dir, tk_code_name + '.xlsx')
     logger.info(f"Файл '{fn_TK_save}' сохранен в директорию '{tk_save_dir}'")
     
     return fn_TK_save
@@ -750,12 +875,12 @@ def data_analysis_composition(
     tk_names, model_names, tk_code_name,
     path_tk_models_processed, fn_TK_save
 ):
-    services_analysis(
+    diff_df_services = services_analysis(
         df_services, 
         tk_names, model_names, tk_code_name,
         path_tk_models_processed
         )
-    LP_analysis(
+    diff_LP_df = LP_analysis(
         df_LP, 
         tk_names, model_names, tk_code_name,
         path_tk_models_processed
@@ -808,6 +933,7 @@ def data_analysis_02(
 def total_comparsion_analysis(
     path_tk_models_source, fn_tk_description,
     df_services, df_LP, df_RM,
+    path_tk_models_processed,
     # first_model = 'База'
 ):
     tk_models = read_description(path_tk_models_source, fn_tk_description)
@@ -839,3 +965,13 @@ def total_comparsion_analysis(
                 tk_names, model_names, tk_code_name,
                 path_tk_models_processed, fn_TK_save    
             )
+
+def compare_tk( data_source_dir, data_processed_dir, supp_dict_dir, fn_tk_bd, fn_tk_description):
+
+    df_services, df_LP, df_RM = preprocess_tkbd(data_source_dir, fn_tk_bd, data_processed_dir, supp_dict_dir)
+    display(df_services.head(2))
+    display(df_LP.head(2))
+    display(df_RM.head(2))
+    # path_tk_models_source = data_source_dir
+    # print(f"path_tk_models_source: '{path_tk_models_source}'")
+    total_comparsion_analysis(data_source_dir, fn_tk_description, df_services, df_LP, df_RM, data_processed_dir)

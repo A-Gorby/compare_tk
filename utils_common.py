@@ -1,3 +1,5 @@
+import pandas as pd
+import numpy as np
 def np_unique_nan(lst: np.array, debug = False)->np.array: # a la version 2.4
     lst_unique = None
     if lst is None or (((type(lst)==float) or (type(lst)==np.float64)) and np.isnan(lst)):

@@ -1,12 +1,15 @@
 import requests
 import os
+import pandas as pd
 from urllib.parse import urlencode
-import os
-from utils_io import logger
+
+from utils_io import logger, restore_df_from_pickle
+
 if len(logger.handlers) > 1:
     for handler in logger.handlers:
         logger.removeHandler(handler)
     from utils_io import logger
+
 def upload_files_services(supp_dict_dir = '/content/data/supp_dict'):
     base_url = 'https://cloud-api.yandex.net/v1/disk/public/resources/download?'
     # public_key = link #'https://yadi.sk/d/UJ8VMK2Y6bJH7A'  # Сюда вписываете вашу ссылку
