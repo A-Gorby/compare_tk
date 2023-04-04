@@ -65,14 +65,31 @@ def extract_groups_from_service_code(s, debug = False):
     return groups.values()
 
 def read_tkbd(path_tkbd_source, fn_tk_bd):
-    df_services = pd.read_excel(os.path.join(path_tkbd_source, fn_tk_bd), sheet_name = 'Услуги')
-    print(df_services.shape)
-    display(df_services.head(2))
-    df_LP = pd.read_excel(os.path.join(path_tkbd_source, fn_tk_bd), sheet_name = 'ЛП')
-    display(df_LP.head(2))
-    df_RM = pd.read_excel(os.path.join(path_tkbd_source, fn_tk_bd), sheet_name = 'РМ')
-    print(df_RM.shape)
-    display(df_RM.head(2))
+    try:
+        df_services = pd.read_excel(os.path.join(path_tkbd_source, fn_tk_bd), sheet_name = 'Услуги')
+        print(df_services.shape)
+        display(df_services.head(2))
+    except Exception as err:
+        logger.error(str(err))
+        logger.error(f"Обработка перкращена: в Excel файле отсутсnвует лист 'Усулги'")
+        sys.exit(2)
+    try:
+        df_LP = pd.read_excel(os.path.join(path_tkbd_source, fn_tk_bd), sheet_name = 'ЛП')
+        print(df_LP.shape)
+        display(df_LP.head(2))
+    except Exception as err:
+        logger.error(str(err))
+        logger.error(f"Обработка перкращена: в Excel файле отсутсnвует лист 'ЛП'")
+        sys.exit(2)
+    try:
+        df_RM = pd.read_excel(os.path.join(path_tkbd_source, fn_tk_bd), sheet_name = 'РМ')
+        print(df_RM.shape)
+        display(df_RM.head(2))
+    except Exception as err:
+        logger.error(str(err))
+        logger.error(f"Обработка перкращена: в Excel файле отсутсnвует лист 'РМ'")
+        sys.exit(2)
+
     return df_services, df_LP, df_RM
 
 def extract_codes_groups(s, debug=False):

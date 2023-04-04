@@ -69,12 +69,13 @@ def read_description(
 ):
     df_desc = pd.read_excel(os.path.join(path_tk_models_source, fn_tk_description))
     print(df_desc.shape)
+    print("Первые строки файла описания моделей")
     display(df_desc.head(2))
     req_cols = ['Наименование ТК', 'Код ТК', 'Профиль', 'Наименование ТК (короткое)', 'Модель пациента', 'Файл Excel']
 
     if not set(req_cols).issubset(list(df_desc.columns)):
         logger.error(f"Файл описания моделей содержит неправильные колонки")
-        logger.error(f"Файл описания моделей должен содержать колонки: {str(rec_cols)}")
+        logger.error(f"Файл описания моделей должен содержать колонки: {str(req_cols)}")
         sys.exit(2)
     
     df_desc.duplicated(subset=['Наименование ТК'])
@@ -97,8 +98,8 @@ def read_description(
             tk_models[tk_name]['Профиль'] = row['Профиль']
             tk_models[tk_name]['Наименование ТК (короткое)'] = row['Наименование ТК (короткое)']
             #tk_models[tk_name]['Модели'].append (dict(zip(['Модель пациента', 'Файл Excel',
-           '#Название листа в файле Excel', 'Услуги', 'ЛП', 'РМ'], row.values[4:])))
-           tk_models[tk_name]['Модели'].append (dict(zip(['Модель пациента', 'Файл Excel',], row.values[4:6])))
+            #  '#Название листа в файле Excel', 'Услуги', 'ЛП', 'РМ'], row.values[4:])))
+            tk_models[tk_name]['Модели'].append (dict(zip(['Модель пациента', 'Файл Excel',], row.values[4:6])))
         # for model in models:
         # print(models_desc)
     return tk_models
