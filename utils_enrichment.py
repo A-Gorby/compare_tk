@@ -65,30 +65,19 @@ def extract_groups_from_service_code(s, debug = False):
     return groups.values()
 
 def read_tkbd(path_tkbd_source, fn_tk_bd):
-    try:
-        df_services = pd.read_excel(os.path.join(path_tkbd_source, fn_tk_bd), sheet_name = 'Услуги')
-        print(df_services.shape)
-        display(df_services.head(2))
-    except Exception as err:
-        logger.error(str(err))
-        logger.error(f"Обработка перкращена: в Excel файле отсутсnвует лист 'Усулги'")
+    xl = pd.ExcelFile(os.path.join(path_tkbd_source, fn_tk_bd))
+    if not set(['Услуги', 'ЛП', 'РМ']).issubset(xl.sheet_names):
+        logger.error(f"Обработка перкращена: в Excel файле со сводом ТК отсутсnвует все необходивмые листы: 'Усулги', 'ЛП', 'РМ'")
         sys.exit(2)
-    try:
-        df_LP = pd.read_excel(os.path.join(path_tkbd_source, fn_tk_bd), sheet_name = 'ЛП')
-        print(df_LP.shape)
-        display(df_LP.head(2))
-    except Exception as err:
-        logger.error(str(err))
-        logger.error(f"Обработка перкращена: в Excel файле отсутсnвует лист 'ЛП'")
-        sys.exit(2)
-    try:
-        df_RM = pd.read_excel(os.path.join(path_tkbd_source, fn_tk_bd), sheet_name = 'РМ')
-        print(df_RM.shape)
-        display(df_RM.head(2))
-    except Exception as err:
-        logger.error(str(err))
-        logger.error(f"Обработка перкращена: в Excel файле отсутсnвует лист 'РМ'")
-        sys.exit(2)
+    df_services = pd.read_excel(os.path.join(path_tkbd_source, fn_tk_bd), sheet_name = 'Услуги')
+    print(df_services.shape)
+    display(df_services.head(2))
+    df_LP = pd.read_excel(os.path.join(path_tkbd_source, fn_tk_bd), sheet_name = 'ЛП')
+    print(df_LP.shape)
+    display(df_LP.head(2))
+    df_RM = pd.read_excel(os.path.join(path_tkbd_source, fn_tk_bd), sheet_name = 'РМ')
+    print(df_RM.shape)
+    display(df_RM.head(2))
 
     return df_services, df_LP, df_RM
 
@@ -147,10 +136,16 @@ def extract_codes_groups_ATH(s, debug = False):
 def preprocess_services(df_services):
     
     service_name_col = 'Наименование услуги по Номенклатуре медицинских услуг (Приказ МЗ №804н)'
+    if service_name_col not in df_services.columns:
+        logger.error(f"Обработка прекращена: файл со сводом ТК, лист'Усулги' не содержит колонки '{service_name_col}'")
+        sys.exit(2)
     df_services[service_name_col] = df_services[service_name_col].progress_apply(lambda x: x.strip() if x is not None else None)
 
     new_services_columns = ['Код раздела', 'Раздел', 'Код типа', 'Тип', 'Код класса', 'Класс' ]
     code_services_col = 'Код услуги по Номенклатуре медицинских услуг (Приказ МЗ № 804н)'
+    if code_services_col not in df_services.columns:
+        logger.error(f"Обработка прекращена: файл со сводом ТК, лист'Услуги' не содержит колокни '{code_services_col}'")
+        sys.exit(2)
     df_services[new_services_columns] = df_services[code_services_col].progress_apply(lambda x: pd.Series(extract_codes_groups(x)))
 
 
@@ -160,6 +155,9 @@ def preprocess_services(df_services):
 def preprocess_LP(df_LP, smnn_list_df):
     # global smnn_list_df
     LP_name_col = 'Наименование лекарственного препарата (ЛП) (МНН)'
+    if LP_name_col not in df_LP.columns:
+        logger.error(f"Обработка прекращена: файл со сводом ТК, лист'ЛП' не содержит колонки '{LP_name_col}'")
+        sys.exit(2)
     df_LP[LP_name_col] = df_LP[LP_name_col].progress_apply(lambda x: x.strip() if x is not None else None)
     PhF_name_col = 'Форма выпуска лекарственного препарата (ЛП)'
     df_LP[PhF_name_col] = df_LP[PhF_name_col].progress_apply(lambda x: x.strip() if x is not None else None)
@@ -194,6 +192,9 @@ def preprocess_LP(df_LP, smnn_list_df):
        'Код фармакологической группы', 'Наименование фармакологической группы',
        'Код химической группы', 'Наименование химической группы',]
     ATH_code_col_name = 'Код группы ЛП (АТХ)'
+    if ATH_code_col_name not in df_LP.columns:
+        logger.error(f"Обработка прекращена: файл со сводом ТК, лист'ЛП' не содержит колокни '{ATH_code_col_name}'")
+        sys.exit(2)
     df_LP[new_ATH_cols] = None
     df_LP[new_ATH_cols] = df_LP[ATH_code_col_name].progress_apply(lambda x: pd.Series(extract_codes_groups_ATH(x, True)))
     print(df_LP[df_LP['Наименование химической группы'].isnull()].shape, df_LP[df_LP['Код химической группы'].isnull()].shape)
@@ -208,6 +209,9 @@ def preprocess_LP(df_LP, smnn_list_df):
 def preprocess_RM(df_RM):
     
     RM_name_col = 'Изделия медицинского назначения и расходные материалы, обязательно используемые при оказании медицинской услуги'
+    if RM_name_col not in df_RM.columns:
+        logger.error(f"Обработка прекращена: файл со сводом ТК, лист'РМ' не содержит колонки '{RM_name_col}'")
+        sys.exit(2)
     df_RM[RM_name_col] = df_RM[RM_name_col].progress_apply(lambda x: x.strip() if x is not None else None)
     return df_RM
 

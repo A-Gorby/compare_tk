@@ -244,7 +244,10 @@ def extract_names_from_code_service(code, debug=False):
 def services_comparison(
     df_services, tk_names, model_names,
     col_to_compare = 'Наименование услуги по Номенклатуре медицинских услуг (Приказ МЗ №804н)'):
-    
+    if 'Файл Excel' not in df_services.columns:
+        logger.error(f"Обработка прекращена: файл со сводом ТК, лист'Услуги' не содержит колонки 'Файл Excel'")
+        sys.exit(2)
+
     df1 = df_services[df_services['Файл Excel']==tk_names[0]]
     df2 = df_services[df_services['Файл Excel']==tk_names[1]]
     # print(df1.shape, df2.shape)
@@ -284,6 +287,10 @@ def services_comparison(
 def LP_comparison(
     df_LP, tk_names, model_names,
     col_to_compare = 'Наименование лекарственного препарата (ЛП) (МНН)'):
+    
+    if 'Файл Excel' not in df_LP.columns:
+        logger.error(f"Обработка прекращена: файл со сводом ТК, лист'ЛП' не содержит колонки 'Файл Excel'")
+        sys.exit(2)
     df1 = df_LP[df_LP['Файл Excel']==tk_names[0]]
     df2 = df_LP[df_LP['Файл Excel']==tk_names[1]]
     # print(df1.shape, df2.shape)
@@ -321,6 +328,10 @@ def RM_comparison(
     df_RM, tk_names, model_names,
     col_to_compare = 'Изделия медицинского назначения и расходные материалы, обязательно используемые при оказании медицинской услуги'):
     
+    if 'Файл Excel' not in df_RM.columns:
+        logger.error(f"Обработка прекращена: файл со сводом ТК, лист'РМ' не содержит колонки 'Файл Excel'")
+        sys.exit(2)
+
     df1 = df_RM[df_RM['Файл Excel']==tk_names[0]]
     df2 = df_RM[df_RM['Файл Excel']==tk_names[1]]
     print(f"Количество МИ/РМ: {model_names[0]}: {df1.shape[0]}, {model_names[1]}: {df2.shape[0]}")
@@ -543,7 +554,10 @@ def LP_analysis(
     
     lp_mask_base = df_LP['Файл Excel'] == tk_names[0]
     lp_mask_techno = df_LP['Файл Excel'] == tk_names[1]
-    
+    if not set(['Код группы ЛП (АТХ)', 'Форма выпуска лекарственного препарата (ЛП)','ФТГ']).issubset(list(df_LP.columns)) :
+        logger.error(f"Обработка прекращена: файл со сводом ТК, лист'ЛП' не содержит колокни '{ATH_code_col_name}'")
+        sys.exit(2)
+
     tk_name, analysis_part, analysis_part_code = tk_code_name, 'ЛП', 2
     columns_to_compare =['Код анатомического органа или системы',
        'Код терапевтической группы', 
