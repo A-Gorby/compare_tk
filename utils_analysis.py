@@ -364,6 +364,12 @@ def services_analysis(
     colors=["#9b59b6", "#3498db", "#95a5a6", "#e74c3c", "#34495e", "#2ecc71"]
     cmap = ListedColormap(["#95a5a6", "#2ecc71"])
 
+    try:
+        # os.mkdir(os.path.join(path_tk_models_processed, tk_code_name))
+        os.mkdir(os.path.join(path_tk_models_processed, tk_code_name, 'img'))
+    except:
+        pass
+
     for i_col, col_name in enumerate(codes_columns_services):
         diff_lst.append([])
         df_p = pd.DataFrame({'count' : df_a.groupby( ['Файл Excel', col_name] ).size()}).reset_index().pivot([col_name], ['Файл Excel'] )\
@@ -400,7 +406,8 @@ def services_analysis(
 
         # fn_img = f"{analysis_part_code:02d}_{analysis_part}_{i_col:02d}.jpg"
         fn_img = f"{analysis_part_code:02d}_Услуги_01_Состав_{i_col:02d}.jpg" #.replace(' ','_')
-        plt.savefig(os.path.join(path_tk_models_processed, tk_code_name, fn_img), bbox_inches='tight')
+        # plt.savefig(os.path.join(path_tk_models_processed, tk_code_name, fn_img), bbox_inches='tight')
+        plt.savefig(os.path.join(path_tk_models_processed, tk_code_name, 'img', fn_img), bbox_inches='tight')
         plt.show()
 
         diff_df_services.append(def_differencies(
@@ -487,7 +494,8 @@ def services_analysis_02(
         # fn_img = f"{analysis_part_code:02d}_{analysis_part}_{i_col:02d}.jpg"
         fn_img = f"01_Услуги_{analysis_subpart_code:02d}_{analysis_subpart}_{i_col:02d}.jpg" #.replace(' ','_')
         
-        plt.savefig(os.path.join(path_tk_models_processed, tk_code_name, fn_img), bbox_inches='tight')
+        # plt.savefig(os.path.join(path_tk_models_processed, tk_code_name, fn_img), bbox_inches='tight')
+        plt.savefig(os.path.join(path_tk_models_processed, tk_code_name, 'img', fn_img), bbox_inches='tight')
         # plt.savefig(path_tk_models_processed + tk_code_name + '/' + fn_img, bbox_inches='tight')
         plt.show()
         try:
@@ -578,7 +586,8 @@ def LP_analysis(
 
         # fn_img = f"{analysis_part_code:02d}_{analysis_part}_{i_col:02d}.jpg"
         fn_img = f"{analysis_part_code:02d}_ЛП_01_Состав_{i_col:02d}.jpg" #.replace(' ','_')
-        plt.savefig(os.path.join(path_tk_models_processed, tk_code_name, fn_img), bbox_inches='tight')
+        # plt.savefig(os.path.join(path_tk_models_processed, tk_code_name, fn_img), bbox_inches='tight')
+        plt.savefig(os.path.join(path_tk_models_processed, tk_code_name, 'img', fn_img), bbox_inches='tight')
         plt.show()
         
         if col_name in columns_to_compare[0:4]:
@@ -683,7 +692,8 @@ def LP_analysis_02(
         # fn_img = f"{analysis_part_code:02d}_ЛП_{analysis_subpart}_{i_col:02d}.jpg"
         fn_img = f"02_ЛП_{analysis_subpart_code:02d}_{analysis_subpart}_{i_col:02d}.jpg" #.replace(' ','_')
         
-        plt.savefig(os.path.join(path_tk_models_processed, tk_code_name, fn_img), bbox_inches='tight')
+        # plt.savefig(os.path.join(path_tk_models_processed, tk_code_name, fn_img), bbox_inches='tight')
+        plt.savefig(os.path.join(path_tk_models_processed, tk_code_name, 'img', fn_img), bbox_inches='tight')
         plt.show()
             
         if col_name in columns_to_compare[0:4]:
@@ -731,7 +741,8 @@ def update_excel_by_analysis(
     for i_p, analysis_part in enumerate(['Услуги', 'ЛП']): #, 'РМ']):
         # fn_img_lst = glob.glob(os.path.join(tk_save_dir, tk_code_name) + f"{i_p+1:02d}_*.jpg")
         fn_img_lst = glob.glob(os.path.join(
-            tk_save_dir, tk_code_name) + f"/{i_p+1:02d}_{analysis_part}_01_Состав_*.jpg")
+            tk_save_dir, tk_code_name, 'img') + f"/{i_p+1:02d}_{analysis_part}_01_Состав_*.jpg")
+            # tk_save_dir, tk_code_name) + f"/{i_p+1:02d}_{analysis_part}_01_Состав_*.jpg")
         print("fn_img_lst:", len(fn_img_lst), fn_img_lst)
         sheet_name = analysis_part + '_Анализ_Состав'
         sheet_names = wb.get_sheet_names()
@@ -791,7 +802,8 @@ def update_excel_by_analysis_02(
     for i_p, analysis_part in enumerate(['Услуги', 'ЛП']): #, 'РМ']):
         for i_sp, (analysis_subpart_code, analysis_subpart) in enumerate(analysis_subpart_lst[i_p]):
             fn_img_lst = glob.glob(os.path.join(
-                path_tk_models_processed, tk_code_name) + f"/{i_p+1:02d}_{analysis_part}_{analysis_subpart_code:02d}_{analysis_subpart}*.jpg")
+                path_tk_models_processed, tk_code_name, 'img') + f"/{i_p+1:02d}_{analysis_part}_{analysis_subpart_code:02d}_{analysis_subpart}*.jpg")
+                # path_tk_models_processed, tk_code_name) + f"/{i_p+1:02d}_{analysis_part}_{analysis_subpart_code:02d}_{analysis_subpart}*.jpg")
                 # path_tk_models_processed, tk_code_name) + f"/{i_p+1:02d}_{analysis_part}_{i_sp:02d}_{analysis_subpart.replace(' ', '_')}*.jpg")
             print("fn_img_lst:", len(fn_img_lst), fn_img_lst)
             sheet_name = analysis_part + '_Анализ_' + analysis_subpart #.replace(' ', '_')
