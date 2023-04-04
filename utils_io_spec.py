@@ -10,7 +10,7 @@ if len(logger.handlers) > 1:
         logger.removeHandler(handler)
     from utils_io import logger
 
-def upload_files_services(limks, supp_dict_dir = '/content/data/supp_dict'):
+def upload_files_services(links, supp_dict_dir = '/content/data/supp_dict'):
     base_url = 'https://cloud-api.yandex.net/v1/disk/public/resources/download?'
     # public_key = link #'https://yadi.sk/d/UJ8VMK2Y6bJH7A'  # Сюда вписываете вашу ссылку
     # links = [('Коды МГФОМС и 804н.xlsx', 'https://disk.yandex.ru/i/lX1fVnK1J7_hfg', ('МГФОМС', '804н')),
