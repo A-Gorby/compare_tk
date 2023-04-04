@@ -554,8 +554,9 @@ def LP_analysis(
     
     lp_mask_base = df_LP['Файл Excel'] == tk_names[0]
     lp_mask_techno = df_LP['Файл Excel'] == tk_names[1]
-    if not set(['Код группы ЛП (АТХ)', 'Форма выпуска лекарственного препарата (ЛП)','ФТГ']).issubset(list(df_LP.columns)) :
-        logger.error(f"Обработка прекращена: файл со сводом ТК, лист'ЛП' не содержит колокни '{ATH_code_col_name}'")
+    req_cols = ['Код группы ЛП (АТХ)', 'Форма выпуска лекарственного препарата (ЛП)','ФТГ']
+    if not set(req_cols).issubset(list(df_LP.columns)) :
+        logger.error(f"Обработка прекращена: файл со сводом ТК, лист'ЛП' не содержит всех колонок '{str(req_cols)}'")
         sys.exit(2)
 
     tk_name, analysis_part, analysis_part_code = tk_code_name, 'ЛП', 2
