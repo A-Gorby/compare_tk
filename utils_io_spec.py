@@ -10,18 +10,18 @@ if len(logger.handlers) > 1:
         logger.removeHandler(handler)
     from utils_io import logger
 
-def upload_files_services(supp_dict_dir = '/content/data/supp_dict'):
+def upload_files_services(limks, supp_dict_dir = '/content/data/supp_dict'):
     base_url = 'https://cloud-api.yandex.net/v1/disk/public/resources/download?'
     # public_key = link #'https://yadi.sk/d/UJ8VMK2Y6bJH7A'  # Сюда вписываете вашу ссылку
-    links = [('Коды МГФОМС и 804н.xlsx', 'https://disk.yandex.ru/i/lX1fVnK1J7_hfg', ('МГФОМС', '804н')),
+    # links = [('Коды МГФОМС и 804н.xlsx', 'https://disk.yandex.ru/i/lX1fVnK1J7_hfg', ('МГФОМС', '804н')),
     # ('serv_name_embeddings.pk1', 'https://disk.yandex.ru/d/8UTwZg5jKOhxXQ'),
-    ('smnn_list_df_esklp_active_20230321_2023_03_24_1238.pickle', 'https://disk.yandex.ru/d/ZU318jcBw85pUg'),
+    # ('smnn_list_df_esklp_active_20230321_2023_03_24_1238.pickle', 'https://disk.yandex.ru/d/ZU318jcBw85pUg'),
     # ('НВМИ_РМ.xls', 'https://disk.yandex.ru/i/_RotfMJ_cSfeOw', 'Sheet1'),
     # ('МНН.xlsx', 'https://disk.yandex.ru/i/0rMKBimIKbS7ig', 'Sheet1'),
     # ('df_mi_national_release_20230201_2023_02_06_1013.zip', 'https://disk.yandex.ru/d/pfgyT_zmcYrHBw' ),
     # ('df_mi_org_gos_release_20230129_2023_02_07_1331.zip', 'https://disk.yandex.ru/d/Zh-5-FG4uJyLQg' ),
     # ('Специальность (унифицированный).xlsx', 'https://disk.yandex.ru/i/au5M0xyVDW2mtQ', None),
-    ]
+    # ]
 
     # Получаем загрузочную ссылку
     for link_t in links:
