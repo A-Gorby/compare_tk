@@ -1001,12 +1001,12 @@ def total_comparsion_analysis(
                 path_tk_models_processed, fn_TK_save    
             )
 
-def compare_tk( data_source_dir, data_processed_dir, supp_dict_dir, fn_tk_bd, fn_tk_description):
+def compare_tk( data_source_dir, data_processed_dir, supp_dict_dir, fn_tk_bd, fn_tk_description, fn_smnn_pickle):
 
     if fn_tk_bd is None or  fn_tk_description is None:
         logger.error(f"Выберите названия файлов: сводного и описания моделей - в параметрах запуска программы")
         sys.exit(2)
-    df_services, df_LP, df_RM = preprocess_tkbd(data_source_dir, fn_tk_bd, data_processed_dir, supp_dict_dir)
+    df_services, df_LP, df_RM = preprocess_tkbd(data_source_dir, fn_tk_bd, data_processed_dir, supp_dict_dir, fn_smnn_pickle)
     display(df_services.head(2))
     display(df_LP.head(2))
     display(df_RM.head(2))

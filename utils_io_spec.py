@@ -10,7 +10,9 @@ if len(logger.handlers) > 1:
         logger.removeHandler(handler)
     from utils_io import logger
 
-def upload_files_services(links, supp_dict_dir = '/content/data/supp_dict'):
+def upload_files_services(
+  links = [('Коды МГФОМС и 804н.xlsx', 'https://disk.yandex.ru/i/lX1fVnK1J7_hfg', ('МГФОМС', '804н'))], 
+  supp_dict_dir = '/content/data/supp_dict'):
     base_url = 'https://cloud-api.yandex.net/v1/disk/public/resources/download?'
     # public_key = link #'https://yadi.sk/d/UJ8VMK2Y6bJH7A'  # Сюда вписываете вашу ссылку
     # links = [('Коды МГФОМС и 804н.xlsx', 'https://disk.yandex.ru/i/lX1fVnK1J7_hfg', ('МГФОМС', '804н')),
@@ -40,7 +42,7 @@ def upload_files_services(links, supp_dict_dir = '/content/data/supp_dict'):
                 logger.info(f"File '{fn_unzip}' upzipped!")
 
 
-def load_check_dictionaries_services(path_supp_dicts):
+def load_check_dictionaries_services(path_supp_dicts, fn_smnn_pickle):
     # global df_services_MGFOMS, df_services_804n, df_RM, df_MNN, df_mi_org_gos, df_mi_national
     # if not os.path.exists(supp_dict_dir):
     #     os.path.mkdir(supp_dict_dir)
@@ -63,6 +65,7 @@ def load_check_dictionaries_services(path_supp_dicts):
     # fn_pickle = 'serv_name_embeddings.pk1'
     # serv_name_embeddings = restore_df_from_pickle(path_supp_dicts, fn_pickle) 
     fn_pickle = 'smnn_list_df_esklp_active_20230321_2023_03_24_1238.pickle'
+    fn_pickle = fn_smnn_pickle
     smnn_list_df = restore_df_from_pickle(path_supp_dicts, fn_pickle)
     
     return df_services_MGFOMS, df_services_804n, smnn_list_df

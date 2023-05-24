@@ -6,3 +6,4 @@ pyxlsb
 #scipy
 #tqdm
 openpyxl
+mega.py

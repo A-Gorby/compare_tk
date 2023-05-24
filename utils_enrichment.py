@@ -220,11 +220,12 @@ from utils_io_spec import load_check_dictionaries_services
 def preprocess_tkbd(
     path_tkbd_source, fn_tk_bd,
     path_tk_models_processed,
-    supp_dict_dir
+    supp_dict_dir,
+    fn_smnn_pickle
     ):
     
     # upload_files_services()
-    df_services_MGFOMS, df_services_804n, smnn_list_df = load_check_dictionaries_services(supp_dict_dir)
+    df_services_MGFOMS, df_services_804n, smnn_list_df = load_check_dictionaries_services(supp_dict_dir, fn_smnn_pickle)
     
     df_services, df_LP, df_RM = read_tkbd(path_tkbd_source, fn_tk_bd)
     df_services = preprocess_services(df_services)
