@@ -67,7 +67,7 @@ def extract_groups_from_service_code(s, debug = False):
 def read_tkbd(path_tkbd_source, fn_tk_bd):
     xl = pd.ExcelFile(os.path.join(path_tkbd_source, fn_tk_bd))
     if not set(['Услуги', 'ЛП', 'РМ']).issubset(xl.sheet_names):
-        logger.error(f"Обработка перкращена: в Excel файле со сводом ТК отсутсnвует все необходивмые листы: 'Усулги', 'ЛП', 'РМ'")
+        logger.error(f"Обработка перкращена: в Excel файле со сводом ТК отсутсnвует все необходивмые листы: 'Услуги', 'ЛП', 'РМ'")
         sys.exit(2)
     df_services = pd.read_excel(os.path.join(path_tkbd_source, fn_tk_bd), sheet_name = 'Услуги')
     print(df_services.shape)
