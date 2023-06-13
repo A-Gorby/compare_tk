@@ -2,6 +2,24 @@ import ipywidgets as widgets
 import pandas as pd
 import os
 from ipywidgets import Layout, Box, Label
+
+def form_param(fn_list):
+    
+    fn_check_file1_drop_douwn = widgets.Dropdown( options=fn_list, value=None) 
+    fn_check_file2_drop_douwn = widgets.Dropdown( options=fn_list, value=None) 
+    
+    form_item_layout = Layout(display='flex', flex_flow='row', justify_content='space-between')
+
+    check_box1 = Box([Label(value="Выберите файл со сводом данных из ТК: 'Услуги', 'ЛП', 'РМ'"), fn_check_file1_drop_douwn], layout=form_item_layout) 
+    check_box2 = Box([Label(value="Выберите файл с описанием моделей:"), fn_check_file2_drop_douwn], layout=form_item_layout) 
+    
+    form_items = [check_box1, check_box2] 
+    
+    form = Box(form_items, layout=Layout(display='flex', flex_flow= 'column', border='solid 2px', align_items='stretch', width='50%')) #width='auto'))
+    # return form_01, fn_check_file1_drop_douwn, fn_check_file2_drop_douwn, sections_drop_douwn
+    return form, fn_check_file1_drop_douwn, fn_check_file2_drop_douwn
+
+
 def form_param_cmp_01(fn_list):
     profile, tk_code, tk_name, models = 'profile_test', '7777777', 'tk_test', ['План', 'Факт']
     profile_enter = widgets.Text(placeholder=profile, value=profile) #'Введите профиль ТК') # description='String:',    disabled=False
