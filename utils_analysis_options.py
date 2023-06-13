@@ -1135,7 +1135,7 @@ def compare_tk_options( data_source_dir, data_processed_dir, supp_dict_dir,
                         ):
 
     if fn_check_file1 is None or  fn_check_file2 is None:
-        logger.error(f"Выберите названия файлов: сводного и описания моделей - в параметрах запуска программы")
+        logger.error(f"Выберите названия файлов: в параметрах запуска программы")
         sys.exit(2)
     # df_services, df_LP, df_RM = preprocess_tkbd_options(data_source_dir, fn_tk_bd, data_processed_dir, supp_dict_dir, fn_smnn_pickle)
     df_services, df_LP, df_RM = preprocess_tkbd_options(
