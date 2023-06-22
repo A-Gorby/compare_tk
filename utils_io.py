@@ -77,37 +77,6 @@ if len(logger.handlers) > 1:
     logger.propagate = False
 
 
-# def load_check_dictionaries_for_services(path_supp_dicts, path_esklp_processed):
-#     global df_services_MGFOMS, df_services_804n
-
-#     fn = 'Коды МГФОМС.xlsx'
-#     fn = 'Коды МГФОМС и 804н.xlsx'
-#     sheet_name = 'МГФОМС'
-#     df_services_MGFOMS = pd.read_excel(os.path.join(path_supp_dicts, fn), sheet_name = sheet_name)
-#     df_services_MGFOMS.rename (columns = {'COD': 'code', 'NAME': 'name'}, inplace=True)
-#     df_services_MGFOMS['code'] = df_services_MGFOMS['code'].astype(str)
-#     # print("df_services_MGFOMS", df_services_MGFOMS.shape, df_services_MGFOMS.columns)
-#     logger.info(f"Загружен справочник 'Услуги по реестру  МГФОМС': {str(df_services_MGFOMS.shape)}")
-
-#     sheet_name = '804н'
-#     df_services_804n = pd.read_excel(os.path.join(path_supp_dicts, fn), sheet_name = sheet_name, header=1)
-#     df_services_804n.rename (columns = {'Код услуги': 'code', 'Наименование медицинской услуги': 'name'}, inplace=True)
-#     # print("df_services_804n", df_services_804n.shape, df_services_804n.columns)
-#     logger.info(f"Загружен справочник 'Услуги по приказу 804н': {str(df_services_804n.shape)}")
-
-#     # path_supp_dicts_processed = 'D:/DPP/02_tkbd/data/supp_dict/processed/'
-#     # fn_df_mi_org_gos = 'df_mi_org_gos_release_20230129_2023_02_07_1331.pickle'
-#     # fn_df_mi_national = 'df_mi_national_release_20230201_2023_02_06_1013.pickle'
-#     # df_mi_org_gos = restore_df_from_pickle(path_supp_dicts_processed, fn_df_mi_org_gos)
-#     # df_mi_national = restore_df_from_pickle(path_supp_dicts_processed, fn_df_mi_national)
-    
-#     fn_smnn_list_df_pickle = 'smnn_list_df_esklp_active_20221223_2022_12_26_0946.pickle'
-#     smnn_list_df = restore_df_from_pickle(path_esklp_processed, fn_smnn_list_df_pickle)
-#     fn_klp_list_dict_df_pickle = 'klp_list_dict_df_esklp_active_20221223_2022_12_26_0954.pickle'
-#     klp_list_dict_df = restore_df_from_pickle(path_esklp_processed, fn_klp_list_dict_df_pickle)
-
-#     return df_services_MGFOMS, df_services_804n, smnn_list_df, klp_list_dict_df #,  df_mi_org_gos, df_mi_national
-
 def unzip_file(path_source, fn_zip, work_path):
     logger.info('Unzip ' + fn_zip + ' start...')
 
@@ -144,13 +113,13 @@ def save_df_lst_to_excel(df_lst, sheet_names_lst, save_path, fn):
     dt = datetime.datetime.now(offset)
     str_date = dt.strftime("%Y_%m_%d_%H%M")
     fn_date = fn.replace('.xlsx','')  + '_' + str_date + '.xlsx'
-    
-    # with pd.ExcelWriter(os.path.join(path_tkbd_processed, fn_date )) as writer:  
-    with pd.ExcelWriter(os.path.join(save_path, fn_date )) as writer:  
-        
+
+    # with pd.ExcelWriter(os.path.join(path_tkbd_processed, fn_date )) as writer:
+    with pd.ExcelWriter(os.path.join(save_path, fn_date )) as writer:
+
         for i, df in enumerate(df_lst):
             df.to_excel(writer, sheet_name = sheet_names_lst[i], index=False)
-    return fn_date    
+    return fn_date
 
 
 
@@ -165,7 +134,7 @@ def get_humanize_filesize(path, fn):
         file_size = os.path.os.path.getsize(fn_full)
         human_file_size = humanize.naturalsize(file_size)
     return human_file_size
-    
+
 def restore_df_from_pickle(path_files, fn_pickle):
 
     if fn_pickle is None:
@@ -179,4 +148,60 @@ def restore_df_from_pickle(path_files, fn_pickle):
     else:
         # logger.error('Restore ' + re.sub(path_files, '', fn_pickle_СЃ) + ' from ' + path_files + ' failed!')
         logger.error('Restore ' + fn_pickle + ' from ' + path_files + ' failed!')
-    return df    
+    return df
+
+def get_cols_width_exists(ws):
+    cols_width_exists = []
+    ws.sheet_state, ws.max_row, ws.max_column
+    for ic in range(ws.max_column):
+        cell = ws.cell(row=1, column=ic+1)
+        cols_width_exists.append(ws.column_dimensions[cell.column_letter].width)
+    return cols_width_exists
+    
+def format_excel_cols_short(ws, format_cols, auto_filter=False):
+    l_alignment=Alignment(horizontal='left', vertical= 'top', text_rotation=0, wrap_text=True, shrink_to_fit=False, indent=0)
+    r_alignment=Alignment(horizontal='right', vertical= 'top', text_rotation=0, wrap_text=True, shrink_to_fit=False, indent=0)
+    last_cell = ws.cell(row=1, column=len(format_cols))
+    full_range = "A1:" + last_cell.column_letter + str(ws.max_row)
+    if auto_filter:
+        ws.auto_filter.ref = full_range
+    ws.freeze_panes = ws['B2']
+    for ic, col_width in enumerate(format_cols):
+        cell = ws.cell(row=1, column=ic+1)
+        cell.alignment = l_alignment
+        ws.column_dimensions[cell.column_letter].width = col_width
+    return ws
+
+def format_excel_sheet_cols(data_processed_dir, fn_xls, col_width_lst, sheet_name):
+    wb = load_workbook(os.path.join(data_processed_dir, fn_xls))
+    # ws = wb.active
+    ws = wb[sheet_name]
+    # l_alignment=Alignment(horizontal='left', vertical= 'top', text_rotation=0, wrap_text=True, shrink_to_fit=False, indent=0)
+    l_alignment=Alignment(horizontal='left', vertical= 'top', text_rotation=0, wrap_text=False, shrink_to_fit=False, indent=0)
+    r_alignment=Alignment(horizontal='right', vertical= 'top', text_rotation=0, wrap_text=True, shrink_to_fit=False, indent=0)
+    border = Border( 
+        left=Side(border_style="thin", color='FF000000'),
+        right=Side(border_style="thin", color='FF000000'),
+        top=Side(border_style="thin", color='FF000000'),
+        bottom=Side(border_style="thin", color='FF000000'),
+     )
+    
+    
+    # ws.filterMode = True
+    last_cell = ws.cell(row=1, column=len(col_width_lst)) 
+    full_range = "A1:" + last_cell.column_letter + str(ws.max_row)
+    ws.auto_filter.ref = full_range
+    ws.freeze_panes = ws['B2']
+    for ic, col_width in enumerate(col_width_lst):
+        cell = ws.cell(row=1, column=ic+1)
+        cell.alignment = l_alignment
+        ws.column_dimensions[cell.column_letter].width = col_width
+    # ft = cell.font
+    # ft = Font(bold=False)
+    # for row in ws[full_range]: #[1:]
+    #     for cell in row:
+    #         cell.font = ft    
+    #         cell.alignment = l_alignment
+    #         cell.border = border
+    wb.save(os.path.join(data_processed_dir, fn_xls))
+
