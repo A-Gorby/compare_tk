@@ -63,7 +63,7 @@ def read_enriched_tk_data(path_tkbd_processed, fn_tk_bd):
     display(df_RM.head(2))
     return df_services, df_LP, df_RM
 
-    
+
 def read_description(
     path_tk_models_source, fn_tk_description,
 ):
@@ -77,7 +77,7 @@ def read_description(
         logger.error(f"Файл описания моделей содержит неправильные колонки")
         logger.error(f"Файл описания моделей должен содержать колонки: {str(req_cols)}")
         sys.exit(2)
-    
+
     df_desc.duplicated(subset=['Наименование ТК'])
     tk_any_models = df_desc[df_desc.duplicated(subset=['Наименование ТК'])]['Наименование ТК'].values
     # tk_any_models
@@ -107,7 +107,7 @@ def read_description(
 def create_tk_models_dict(models, xls_files, tk_code=7777777, tk_name='tk_test', profile='profile_test', tk_models = {} ):
     # tk_models = {}
     max_len = 40
-    
+
     if tk_models.get(tk_name) is None:
         tk_models[tk_name] = {}
     tk_models[tk_name]['Код ТК'] = tk_code
@@ -118,7 +118,7 @@ def create_tk_models_dict(models, xls_files, tk_code=7777777, tk_name='tk_test',
     #                           'техно.xlsx'},
     #           {'Модель пациента': 'База',
     #             'Файл Excel': 'Аденома_предстательной_железы_Склероз_шейки_мочевого_пузыря_Стриктура.xlsx'}],
-    
+
     # tk_models[tk_name]['Модели'] = [models]
         # tk_models.setdefault('tk_name', []).append(row['Наименование ТК'])
     #tk_models[tk_name]['Модели'].append (dict(zip(['Модель пациента', 'Файл Excel',
@@ -127,13 +127,13 @@ def create_tk_models_dict(models, xls_files, tk_code=7777777, tk_name='tk_test',
     tk_models[tk_name]['Модели'] = []
     for i_m, model in enumerate(models):
         tk_models[tk_name]['Модели'].append (dict(zip(['Модель пациента', 'Файл Excel',], [model, xls_files[i_m]])))
-    
+
     return tk_models
 
 def format_excel_cols_short(ws, format_cols, auto_filter=False):
     l_alignment=Alignment(horizontal='left', vertical= 'top', text_rotation=0, wrap_text=True, shrink_to_fit=False, indent=0)
     r_alignment=Alignment(horizontal='right', vertical= 'top', text_rotation=0, wrap_text=True, shrink_to_fit=False, indent=0)
-    last_cell = ws.cell(row=1, column=len(format_cols)) 
+    last_cell = ws.cell(row=1, column=len(format_cols))
     full_range = "A1:" + last_cell.column_letter + str(ws.max_row)
     if auto_filter:
         ws.auto_filter.ref = full_range
@@ -156,10 +156,10 @@ def change_order_base_techno(new_columns_02):
             if i_base > 0: i_base -= 1
             new_columns_03.insert(i_base, 'Техно')
             new_columns_03.insert(i_base, 'База')
-            
-            
+
+
             return new_columns_03
-            
+
         else: return new_columns_02
     else: return new_columns_02
 
@@ -174,16 +174,16 @@ def reorder_columns_by_models(new_columns_02, model_names):
             if i_first > 0: i_first -= 1
             new_columns_03.insert(i_first, model_names[1])
             new_columns_03.insert(i_first, model_names[0])
-            
-            
+
+
             return new_columns_03
-            
+
         else: return new_columns_02
     else: return new_columns_02
 
 def simplify_multi_index (df_p, tk_names, model_names):
     '''
-    on enter pdDataFrame with columns 
+    on enter pdDataFrame with columns
     MultiIndex([('count',  'Техкарта БА КС база.xlsx'), ('count', 'Техкарта БА КС техно.xlsx')], names=[None, 'Файл Excel'])
     '''
     pp_lst = []
@@ -200,23 +200,23 @@ def simplify_multi_index (df_p, tk_names, model_names):
     # print("cur_columns_02:", cur_columns_02)
     # new_columns_02 = ['База' if (str(col[1])==tk_names[0]) else 'Техно' for col in cur_columns_02]
     new_columns_02 = [model_names[0] if (str(col[1])==tk_names[0]) else model_names[1] for col in cur_columns_02]
-    new_columns_02 = [new_columns[0]] + new_columns_02 # + [new_columns[-1]] #+ code_names_columns 
+    new_columns_02 = [new_columns[0]] + new_columns_02 # + [new_columns[-1]] #+ code_names_columns
     # print("new_columns_02:", new_columns_02)
-    
+
     df_pp = pd.DataFrame(pp_lst, columns = new_columns_02)
     # new_columns_03 = change_order_base_techno(new_columns_02)
     new_columns_03 = reorder_columns_by_models(new_columns_02, model_names)
     # print(f"new_columns_03: {new_columns_03}")
     df_pp = df_pp[new_columns_03]
-            
+
     return df_pp
 
 
 
 def simplify_multi_index_02 (df_p, tk_names, model_names):
-# def simpl_multi_index_02 (df_p, tk_names, model_names):    
+# def simpl_multi_index_02 (df_p, tk_names, model_names):
     '''
-    on enter pdDataFrame with columns 
+    on enter pdDataFrame with columns
     MultiIndex([('count',  'Техкарта БА КС база.xlsx'), ('count', 'Техкарта БА КС техно.xlsx')], names=[None, 'Файл Excel'])
     '''
     pp_lst = []
@@ -233,14 +233,14 @@ def simplify_multi_index_02 (df_p, tk_names, model_names):
     # print("cur_columns_02:", cur_columns_02)
     # new_columns_02 = ['База' if (str(col[1])==tk_names[0]) else 'Техно' for col in cur_columns_02]
     new_columns_02 = [model_names[0] if (str(col)==tk_names[0]) else model_names[1] for col in new_columns[1:]]
-    new_columns_02 = [new_columns[0]] + new_columns_02 
+    new_columns_02 = [new_columns[0]] + new_columns_02
     # print("new_columns_02:", new_columns_02)
-    
+
     df_pp = pd.DataFrame(pp_lst, columns = new_columns_02)
     # new_columns_03 = change_order_base_techno(new_columns_02)
     new_columns_03 = reorder_columns_by_models(new_columns_02, model_names)
     df_pp = df_pp[new_columns_03]
-            
+
     return df_pp
 
 def def_differencies(df_pp, tk_names, model_names, code_names_columns, function_extract_names=None):
@@ -251,7 +251,7 @@ def def_differencies(df_pp, tk_names, model_names, code_names_columns, function_
     except Exception as err:
         print(err)
         df_pp[diff_col_name] = df_pp[[model_names[0], model_names[1]]].progress_apply(lambda x: pd.Series( float(x[0])-float(x[1])), axis=1)
-    
+
     for i_row, row in df_pp[df_pp[diff_col_name]!=0].iterrows():
         if function_extract_names is not None:
             code_names = function_extract_names(row.values[0])
@@ -259,13 +259,13 @@ def def_differencies(df_pp, tk_names, model_names, code_names_columns, function_
             diff_lst.append([*[v for v in row.values],*[n for n in code_names] ])
         else:
             diff_lst.append(list(row.values))
-    
+
     if function_extract_names is not None:
         new_columns = list(df_pp.columns) + code_names_columns
-    else: 
+    else:
         new_columns =  list(df_pp.columns)
     diff_df = pd.DataFrame(diff_lst, columns = new_columns)
-    
+
     return diff_df
 
 
@@ -284,7 +284,7 @@ def extract_names_from_code_service(code, debug=False):
             else: class_name = service_classes_B.get(code[4:7])
         else: return section_name, type_name, class_name
     else: return section_name, type_name, class_name
-    
+
     return section_name, type_name, class_name
 
 def services_comparison(
@@ -298,42 +298,42 @@ def services_comparison(
     df2 = df_services[df_services['Файл Excel']==tk_names[1]]
     # print(df1.shape, df2.shape)
     print(f"Количество услуг: {model_names[0]}: {df1.shape}, {model_names[1]}: {df2.shape}")
-    
+
     services_df1 = df1[col_to_compare].unique()
     services_df2 = df2[col_to_compare].unique()
     print(f"Количество уникальных услуг: {model_names[0]}: {len(services_df1)}, {model_names[1]}: {len(services_df2)}")
-    
+
     common_services = [s for s in services_df1 if s in services_df2] + [s for s in services_df2 if s in services_df1]
     common_services = list(set(common_services))
     print("Количество общих услуг", len(common_services))
-    
+
     diff_services_1_f_2 = [s for s in services_df1 if s not in services_df2]
     print(f"Количество отличающихся услуг: {model_names[0]}: {len(diff_services_1_f_2)}")
     # print(f"{diff_services_1_f_2[:5]}")
     diff_services_2_f_1 = [s for s in services_df2 if s not in services_df1]
     print(f"Количество отличающихся услуг: {model_names[1]}: {len(diff_services_2_f_1)}")
     # print(f"{diff_services_2_f_1[:5]}")
-    
+
     df_common_services = pd.DataFrame([['Общие', s] for s in common_services], columns=['Тип сравнения', 'Услуга'])
     # df_common_services.head(2)
     # print(df_common_services.shape)
     # pprint(diff_services_1_f_2)
-    df_diff_services_1_f_2 = pd.DataFrame([[f"Есть в '{model_names[0]}', нет в '{model_names[1]}'", s] 
+    df_diff_services_1_f_2 = pd.DataFrame([[f"Есть в '{model_names[0]}', нет в '{model_names[1]}'", s]
                                            for s in diff_services_1_f_2], columns=['Тип сравнения', 'Услуга'])
     # df_diff_services_1_f_2.head(2)
-    df_diff_services_2_f_1 = pd.DataFrame([[f"Есть в '{model_names[1]}', нет в '{model_names[0]}'", s] 
+    df_diff_services_2_f_1 = pd.DataFrame([[f"Есть в '{model_names[1]}', нет в '{model_names[0]}'", s]
                                            for s in diff_services_2_f_1], columns=['Тип сравнения', 'Услуга'])
     # df_diff_services_2_f_1.head(2)
     # print(df_diff_services_2_f_1.shape)
     df_services_compare = pd.concat([df_common_services, df_diff_services_1_f_2, df_diff_services_2_f_1])
     print(f"Услуги: Итого строк сравнения: {df_services_compare.shape[0]}")
-    
+
     return df_services_compare
 
 def LP_comparison(
     df_LP, tk_names, model_names,
     col_to_compare = 'Наименование лекарственного препарата (ЛП) (МНН)'):
-    
+
     if 'Файл Excel' not in df_LP.columns:
         logger.error(f"Обработка прекращена: файл со сводом ТК, лист'ЛП' не содержит колонки 'Файл Excel'")
         sys.exit(2)
@@ -344,7 +344,7 @@ def LP_comparison(
     LP_df1 = df1[col_to_compare].unique()
     LP_df2 = df2[col_to_compare].unique()
     print(f"Количество уникальных ЛП: {model_names[0]}: {len(LP_df1)}, {model_names[1]}: {len(LP_df2)}")
-    
+
     common_LP = [s for s in LP_df1 if s in LP_df2] + [s for s in LP_df2 if s in LP_df1]
     common_LP = list(set(common_LP))
     print(f"Количество общих ЛП: {len(common_LP)}")
@@ -353,27 +353,27 @@ def LP_comparison(
     print(f"Количество отличающихся ЛП: {model_names[0]}: {len(diff_LP_1_f_2)}")
     diff_LP_2_f_1 = [s for s in LP_df2 if s not in LP_df1]
     print(f"Количество отличающихся ЛП: {model_names[1]}: {len(diff_LP_2_f_1)}")
-    
+
     df_common_LP = pd.DataFrame([['Общие ЛП(МНН)', s] for s in common_LP], columns=['Тип сравнения', 'ЛП(МНН)'])
     # df_common_LP.head(2)
     # print(df_common_LP.shape)
     # pprint(diff_services_1_f_2)
-    df_diff_LP_1_f_2 = pd.DataFrame([[f"Есть в '{model_names[0]}', нет в '{model_names[1]}'", s] 
+    df_diff_LP_1_f_2 = pd.DataFrame([[f"Есть в '{model_names[0]}', нет в '{model_names[1]}'", s]
                                            for s in diff_LP_1_f_2], columns=['Тип сравнения', 'ЛП(МНН)'])
     # df_diff_services_1_f_2.head(2)
-    df_diff_LP_2_f_1 = pd.DataFrame([[f"Есть в '{model_names[1]}', нет в '{model_names[0]}'", s] 
+    df_diff_LP_2_f_1 = pd.DataFrame([[f"Есть в '{model_names[1]}', нет в '{model_names[0]}'", s]
                                            for s in diff_LP_2_f_1], columns=['Тип сравнения', 'ЛП(МНН)'])
-    
+
     df_LP_compare = pd.concat([df_common_LP, df_diff_LP_1_f_2, df_diff_LP_2_f_1])
     # print(df_LP_compare.shape)
     print(f"ЛП: Итого строк сравнения: {df_LP_compare.shape[0]}")
-    
+
     return df_LP_compare
 
 def RM_comparison(
     df_RM, tk_names, model_names,
     col_to_compare = 'Изделия медицинского назначения и расходные материалы, обязательно используемые при оказании медицинской услуги'):
-    
+
     if 'Файл Excel' not in df_RM.columns:
         logger.error(f"Обработка прекращена: файл со сводом ТК, лист'РМ' не содержит колонки 'Файл Excel'")
         sys.exit(2)
@@ -384,27 +384,27 @@ def RM_comparison(
     RM_df1 = df1[col_to_compare].unique()
     RM_df2 = df2[col_to_compare].unique()
     print(f"Количество уникальных МИ/РМ: {model_names[0]}: {len(RM_df1)}, {model_names[1]}: {len(RM_df2)}")
-    
+
     common_RM = [s for s in RM_df1 if s in RM_df2] + [s for s in RM_df2 if s in RM_df1]
     common_RM = list(set(common_RM))
     print(f"Количество общих МИ/РМ: {len(common_RM)}")
-    
+
     diff_RM_1_f_2 = [s for s in RM_df1 if s not in RM_df2]
     print(f"Количество отличающихся МИ/РМ: {model_names[0]}: {len(diff_RM_1_f_2)}")
     diff_RM_2_f_1 = [s for s in RM_df2 if s not in RM_df1]
     print(f"Количество отличающихся МИ/РМ: {model_names[1]}: {len(diff_RM_2_f_1)}")
-    
+
     df_common_RM = pd.DataFrame([['Общие МИ/РМ', s] for s in common_RM], columns=['Тип сравнения', 'МИ/РМ'])
-    df_diff_RM_1_f_2 = pd.DataFrame([[f"Есть в '{model_names[0]}', нет в '{model_names[1]}'", s] 
+    df_diff_RM_1_f_2 = pd.DataFrame([[f"Есть в '{model_names[0]}', нет в '{model_names[1]}'", s]
                                            for s in diff_RM_1_f_2], columns=['Тип сравнения', 'МИ/РМ'])
     # df_diff_services_1_f_2.head(2)
-    df_diff_RM_2_f_1 = pd.DataFrame([[f"Есть в '{model_names[1]}', нет в '{model_names[0]}'", s] 
+    df_diff_RM_2_f_1 = pd.DataFrame([[f"Есть в '{model_names[1]}', нет в '{model_names[0]}'", s]
                                            for s in diff_RM_2_f_1], columns=['Тип сравнения', 'МИ/РМ'])
-    
+
     df_RM_compare = pd.concat([df_common_RM, df_diff_RM_1_f_2, df_diff_RM_2_f_1])
     # print(df_LP_compare.shape)
     print(f"ЛП: Итого строк сравнения: {df_RM_compare.shape[0]}")
-    
+
     return df_RM_compare
 
 
@@ -412,7 +412,7 @@ def services_analysis(
     df_services, tk_names, model_names, tk_code_name,
     path_tk_models_processed
     ):
-    
+
     codes_columns_services = ['Код раздела', 'Код типа', 'Код класса']
     code_names_columns_services = ['Раздел', 'Тип', 'Класс']
     services_mask_base = df_services['Файл Excel'] == tk_names[0]
@@ -421,7 +421,7 @@ def services_analysis(
     # sys.exit(2)
     # tk_names = [models_dict_lst[0]['Файл Excel'], models_dict_lst[1]['Файл Excel'] ]
     # model_names = [models_dict_lst[0]['Модель пациента'], models_dict_lst[1]['Модель пациента'] ]
-    
+
     df_a = df_services[services_mask_base | services_mask_techno]
     # tk_name, model, analysis_part, analysis_part_code = 'Нейрохирургия',  'База', 'Услуги', 1
     tk_name, model, analysis_part, analysis_part_code = tk_code_name,  'База', 'Услуги', 1
@@ -463,9 +463,9 @@ def services_analysis(
             for i_max in range(10):
                 # df_pp1 = df_pp[(df_pp['База']>=y_lim_min + i_max) | (df_pp['Техно']>=y_lim_min + i_max)]
                 df_pp1 = df_pp[(df_pp[model_names[0]]>=y_lim_min + i_max) | (df_pp[model_names[1]]>=y_lim_min + i_max)]
-                
+
                 if df_pp1.shape[0] <= n_bars_max_on_picture:
-                    ax1 = df_pp1.plot(kind= kind, x = col_name, rot=45, cmap = cmap) 
+                    ax1 = df_pp1.plot(kind= kind, x = col_name, rot=45, cmap = cmap)
                     break
 
         legend_list = model_names
@@ -484,7 +484,7 @@ def services_analysis(
 
         diff_df_services.append(def_differencies(
                              df_pp, tk_names, model_names,
-                             code_names_columns = code_names_columns_services, 
+                             code_names_columns = code_names_columns_services,
                              function_extract_names = extract_names_from_code_service))
         display(diff_df_services[i_col])
         # sys.exit(2)
@@ -496,9 +496,9 @@ def services_analysis_02(
     analysis_subpart_code, analysis_subpart,
     indicator_col_name = 'Усредненная частота предоставления',
     agg_type = 'Среднее',
-    
+
     ):
-    
+
     codes_columns_services = ['Код раздела', 'Код типа', 'Код класса']
     code_names_columns_services = ['Раздел', 'Тип', 'Класс']
     services_mask_base = df_services['Файл Excel'] == tk_names[0]
@@ -557,7 +557,7 @@ def services_analysis_02(
 
                         if df_pp1.shape[0] <= n_bars_max_on_picture:
                             print(f"i_max: {i_max}, df_pp1.shape[0]: {df_pp1.shape[0]}")
-                            ax1 = df_pp1.plot(kind= kind, x = col_name, rot=45, cmap = cmap) #, y_lim= (y_lim_min + i_max,100)) 
+                            ax1 = df_pp1.plot(kind= kind, x = col_name, rot=45, cmap = cmap) #, y_lim= (y_lim_min + i_max,100))
                             flag_pic_plotted = True
                             break
                 except Exception as err:
@@ -584,7 +584,7 @@ def services_analysis_02(
 
             # fn_img = f"{analysis_part_code:02d}_{analysis_part}_{i_col:02d}.jpg"
             fn_img = f"01_Услуги_{analysis_subpart_code:02d}_{analysis_subpart}_{i_col:02d}.jpg" #.replace(' ','_')
-            
+
             # plt.savefig(os.path.join(path_tk_models_processed, tk_code_name, fn_img), bbox_inches='tight')
             plt.savefig(os.path.join(path_tk_models_processed, tk_code_name, 'img', fn_img), bbox_inches='tight')
             # plt.savefig(path_tk_models_processed + tk_code_name + '/' + fn_img, bbox_inches='tight')
@@ -592,7 +592,7 @@ def services_analysis_02(
         try:
             diff_df_services.append(def_differencies(
                                  df_pp, tk_names, model_names,
-                                 code_names_columns = code_names_columns_services, 
+                                 code_names_columns = code_names_columns_services,
                                  function_extract_names = extract_names_from_code_service))
             display(diff_df_services[i_col])
         except Exception as err:
@@ -623,7 +623,7 @@ def LP_analysis(
     df_LP, tk_names, model_names, tk_code_name,
     path_tk_models_processed
     ):
-    
+
     lp_mask_base = df_LP['Файл Excel'] == tk_names[0]
     lp_mask_techno = df_LP['Файл Excel'] == tk_names[1]
     req_cols = ['Код группы ЛП (АТХ)', 'Форма выпуска лекарственного препарата (ЛП)','ФТГ']
@@ -633,13 +633,13 @@ def LP_analysis(
 
     tk_name, analysis_part, analysis_part_code = tk_code_name, 'ЛП', 2
     columns_to_compare =['Код анатомического органа или системы',
-       'Код терапевтической группы', 
+       'Код терапевтической группы',
        'Код фармакологической группы',
-       'Код химической группы', 
-       'Код группы ЛП (АТХ)', 
+       'Код химической группы',
+       'Код группы ЛП (АТХ)',
         'Форма выпуска лекарственного препарата (ЛП)',
         'ФТГ']
-    code_names_columns_ATH = ['Анатомический орган или система', 'Терапевтическая группа', 
+    code_names_columns_ATH = ['Анатомический орган или система', 'Терапевтическая группа',
        'Фармакологическая группа', 'Химическая группа']
     analysis_part = 'ЛП'
     diff_LP_df = []
@@ -648,12 +648,12 @@ def LP_analysis(
     # colors=["#9b59b6", "#3498db", "#95a5a6", "#e74c3c", "#34495e", "#2ecc71"]
     cmap = ListedColormap(["#95a5a6", "#2ecc71"])
     y_lim_min = 0
-    
+
     for i_col, col_name in enumerate(columns_to_compare):
         df_p = pd.DataFrame({'count' : df_a.groupby( ['Файл Excel', col_name] ).size()}).reset_index().pivot([col_name], ['Файл Excel'] )\
         .fillna(0)
         # display(df_p.reset_index())
-        kind = 'bar' 
+        kind = 'bar'
         df_pp = simplify_multi_index (df_p, tk_names, model_names)
         # print("df_pp.shape[0]:", df_pp.shape[0])
         kind = 'bar' #'kde' #'area' #'bar'
@@ -668,7 +668,7 @@ def LP_analysis(
                 # df_pp1 = df_pp[(df_pp['База']>=y_lim_min + i_max) | (df_pp['Техно']>=y_lim_min + i_max)]
                 df_pp1 = df_pp[(df_pp[model_names[0]]>=y_lim_min + i_max) | (df_pp[model_names[1]]>=y_lim_min + i_max)]
                 if df_pp1.shape[0] <= n_bars_max_on_picture:
-                    ax1 = df_pp1.plot(kind= kind, x = col_name, rot=45, cmap = cmap) 
+                    ax1 = df_pp1.plot(kind= kind, x = col_name, rot=45, cmap = cmap)
                     break
 
         legend_list = model_names
@@ -684,16 +684,16 @@ def LP_analysis(
         # plt.savefig(os.path.join(path_tk_models_processed, tk_code_name, fn_img), bbox_inches='tight')
         plt.savefig(os.path.join(path_tk_models_processed, tk_code_name, 'img', fn_img), bbox_inches='tight')
         plt.show()
-        
+
         if col_name in columns_to_compare[0:4]:
             diff_LP_df.append(def_differencies(
                 df_pp, tk_names, model_names, code_names_columns = code_names_columns_ATH, function_extract_names=extract_name_groups_ATH))
-        else: 
+        else:
             diff_LP_df.append(def_differencies(df_pp, tk_names, model_names, [], function_extract_names=None))
-        
+
         # diff_df_LP.append(def_differencies(
         #                      df_pp, tk_names, model_names,
-        #                      code_names_columns = code_names_columns_services, 
+        #                      code_names_columns = code_names_columns_services,
         #                      function_extract_names = extract_names_from_code_service))
         display(diff_LP_df[i_col])
     return diff_LP_df
@@ -708,16 +708,16 @@ def LP_analysis_02(
     # print("analysis_part:", analysis_part)
     lp_mask_base = df_LP['Файл Excel'] == tk_names[0]
     lp_mask_techno = df_LP['Файл Excel'] == tk_names[1]
-    
+
     # tk_name, analysis_part, analysis_part_code = tk_code_name, 'ЛП', 2
     columns_to_compare =['Код анатомического органа или системы',
-       'Код терапевтической группы', 
+       'Код терапевтической группы',
        'Код фармакологической группы',
-       'Код химической группы', 
-       'Код группы ЛП (АТХ)', 
+       'Код химической группы',
+       'Код группы ЛП (АТХ)',
         'Форма выпуска лекарственного препарата (ЛП)',
         'ФТГ']
-    code_names_columns_ATH = ['Анатомический орган или система', 'Терапевтическая группа', 
+    code_names_columns_ATH = ['Анатомический орган или система', 'Терапевтическая группа',
        'Фармакологическая группа', 'Химическая группа']
     # analysis_part = 'ЛП'
     diff_LP_df = []
@@ -727,7 +727,7 @@ def LP_analysis_02(
     cmap = ListedColormap(["#95a5a6", "#2ecc71"])
     y_lim_min = 0
     diff_lst = []
-    
+
     for i_col, col_name in enumerate(columns_to_compare):
         diff_lst.append([])
         if agg_type == 'Среднее':
@@ -745,7 +745,7 @@ def LP_analysis_02(
         title = '\n'.join([tk_code_name, 'ЛП', analysis_subpart]) #, indicator_col_name]) #, col_name])
         # print("title:", title)
         y_lim_min = 0
-        
+
         print(f"df_pp.shape[0]:", df_pp.shape[0])
         if df_pp.shape[0] <= n_bars_max_on_picture:
             plt.figure(figsize=(25, 6), tight_layout=True)
@@ -764,7 +764,7 @@ def LP_analysis_02(
                         df_pp1 = df_pp[(df_pp[model_names[0]]>=min_v + i_max*delta_v) | (df_pp[model_names[1]]>=min_v + i_max*delta_v)]
                         if df_pp1.shape[0] <= n_bars_max_on_picture:
                             print(f"i_max: {i_max}, df_pp1.shape[0]: {df_pp1.shape[0]}")
-                            ax1 = df_pp1.plot(kind= kind, x = col_name, rot=45, cmap = cmap) #, y_lim= (y_lim_min + i_max,100)) 
+                            ax1 = df_pp1.plot(kind= kind, x = col_name, rot=45, cmap = cmap) #, y_lim= (y_lim_min + i_max,100))
                             fl_break = True
                             break
                     if not fl_break:
@@ -786,22 +786,22 @@ def LP_analysis_02(
 
         # fn_img = f"{analysis_part_code:02d}_ЛП_{analysis_subpart}_{i_col:02d}.jpg"
         fn_img = f"02_ЛП_{analysis_subpart_code:02d}_{analysis_subpart}_{i_col:02d}.jpg" #.replace(' ','_')
-        
+
         # plt.savefig(os.path.join(path_tk_models_processed, tk_code_name, fn_img), bbox_inches='tight')
         plt.savefig(os.path.join(path_tk_models_processed, tk_code_name, 'img', fn_img), bbox_inches='tight')
         plt.show()
-            
+
         if col_name in columns_to_compare[0:4]:
             try:
                 diff_LP_df.append(def_differencies(
-                    df_pp, tk_names, model_names, code_names_columns = code_names_columns_ATH, 
+                    df_pp, tk_names, model_names, code_names_columns = code_names_columns_ATH,
                     function_extract_names=extract_name_groups_ATH))
                 display(diff_LP_df[i_col])
             except Exception as err:
                 diff_LP_df.append(None)
                 logger.error(str(err))
                 logger.error(f"Данные анализа об отличиях не выводятся из-за некорректных входных данных")
-        else: 
+        else:
             try:
                 diff_LP_df.append(def_differencies(df_pp, tk_names, model_names, [], function_extract_names=None))
                 display(diff_LP_df[i_col])
@@ -809,12 +809,12 @@ def LP_analysis_02(
                 diff_LP_df.append(None)
                 logger.error(str(err))
                 logger.error(f"Данные анализа об отличиях не выводятся из-за некорректных входных данных")
-        
+
         # diff_df_LP.append(def_differencies(
         #                      df_pp, tk_names, model_names,
-        #                      code_names_columns = code_names_columns_services, 
+        #                      code_names_columns = code_names_columns_services,
         #                      function_extract_names = extract_names_from_code_service))
-        
+
     return diff_LP_df
 
 # def update_excel_by_analysis(
@@ -868,7 +868,7 @@ def update_excel_by_analysis_options(diff_df_services, diff_LP_df, tk_save_dir, 
 
             for i_f, fn_img in enumerate(fn_img_lst):
                 img = drawing.image.Image(fn_img)
-                anchor = f"A{images_total_rows + explain_rows+1}" 
+                anchor = f"A{images_total_rows + explain_rows+1}"
                 ws.add_image(img, anchor)
                 # img_rows = int(img.height//cell_height   + 1) # + interval_row
                 img_rows = img.height//cell_height   + 1 + 2*interval_row
@@ -885,7 +885,7 @@ def update_excel_by_analysis_options(diff_df_services, diff_LP_df, tk_save_dir, 
 
                 # print(img.height, img_rows, images_total_rows, explain_rows)
 
-    wb.save(os.path.join(tk_save_dir, tk_code_name, fn_TK_save))   
+    wb.save(os.path.join(tk_save_dir, tk_code_name, fn_TK_save))
     logger.info(f"Файл '{fn_TK_save}' дополнен данными анализа и сохранен в '{os.path.join(tk_save_dir, tk_code_name, fn_TK_save)}'")
 
 
@@ -895,7 +895,7 @@ def update_excel_by_analysis_02_options(
     path_tk_models_processed, tk_code_name, fn_TK_save,
     cmp_sections
     ):
-    
+
     wb = load_workbook(os.path.join(path_tk_models_processed, tk_code_name, fn_TK_save))
     # tk_name, model, analysis_part, analysis_part_code = 'Нейрохирургия',  'База', 'Услуги', 1
     if len(diff_df_services_02)==0: diff_df_services_02 = None
@@ -936,7 +936,7 @@ def update_excel_by_analysis_02_options(
 
                 for i_f, fn_img in enumerate(fn_img_lst):
                     img = drawing.image.Image(fn_img)
-                    anchor = f"A{images_total_rows + explain_rows+1}" 
+                    anchor = f"A{images_total_rows + explain_rows+1}"
                     ws.add_image(img, anchor)
                     # img_rows = int(img.height//cell_height   + 1) # + interval_row
                     img_rows = img.height//cell_height   + 1 + 2*interval_row
@@ -965,7 +965,7 @@ def update_excel_by_analysis_02_options(
 
             # print(img.height, img_rows, images_total_rows, explain_rows)
 
-    wb.save(os.path.join(path_tk_models_processed, tk_code_name, fn_TK_save))   
+    wb.save(os.path.join(path_tk_models_processed, tk_code_name, fn_TK_save))
     logger.info(f"Файл '{fn_TK_save}' дополнен данными анализа и сохранен в '{os.path.join(path_tk_models_processed, tk_code_name)}'")
 
 
@@ -980,29 +980,29 @@ def data_comparsion_options (
     if 'Услуги' in cmp_sections:
         df_services_compare = services_comparison(
             df_services, tk_names, model_names,
-            col_to_compare = 'Наименование услуги по Номенклатуре медицинских услуг (Приказ МЗ №804н)')    
+            col_to_compare = 'Наименование услуги по Номенклатуре медицинских услуг (Приказ МЗ №804н)')
         df_to_save_lst.append(df_services_compare)
         sheets_to_save_lst.append('Услуги_Сравнение')
-        
+
     if 'ЛП' in cmp_sections:
         df_LP_compare = LP_comparison(
             df_LP, tk_names, model_names,
-            col_to_compare = 'Наименование лекарственного препарата (ЛП) (МНН)')    
+            col_to_compare = 'Наименование лекарственного препарата (ЛП) (МНН)')
         df_to_save_lst.append(df_LP_compare)
         sheets_to_save_lst.append('ЛП_Сравнение')
-        
+
     if 'РМ' in cmp_sections:
         df_RM_compare = RM_comparison(
             df_RM, tk_names, model_names,
             col_to_compare = 'Изделия медицинского назначения и расходные материалы, обязательно используемые при оказании медицинской услуги')
         df_to_save_lst.append(df_RM_compare)
         sheets_to_save_lst.append('РМ_Сравнение')
-        
+
     tk_save_dir = os.path.join(path_tk_models_processed, tk_code_name)
     if not os.path.exists(tk_save_dir): os.mkdir(tk_save_dir)
     fn_TK_save = save_df_lst_to_excel(df_to_save_lst, sheets_to_save_lst, tk_save_dir, tk_code_name + '.xlsx')
     logger.info(f"Файл '{fn_TK_save}' сохранен в директорию '{tk_save_dir}'")
-    
+
     return fn_TK_save
 
 def data_analysis_composition_options(
@@ -1015,7 +1015,7 @@ def data_analysis_composition_options(
     # sheets_to_save_lst = []
     if 'Услуги' in cmp_sections:
         diff_df_services = services_analysis(
-            df_services, 
+            df_services,
             tk_names, model_names, tk_code_name,
             path_tk_models_processed
             )
@@ -1023,10 +1023,10 @@ def data_analysis_composition_options(
     else: diff_df_services = None
     if 'ЛП' in cmp_sections:
         diff_LP_df = LP_analysis(
-            df_LP, 
+            df_LP,
             tk_names, model_names, tk_code_name,
             path_tk_models_processed
-        )   
+        )
         # df_to_save_lst.append(diff_LP_df)
     else: diff_LP_df = None
     # update_excel_by_analysis(diff_df_services, diff_LP_df, path_tk_models_processed, tk_code_name, fn_TK_save )
@@ -1038,13 +1038,13 @@ def data_analysis_02_options(
     path_tk_models_processed, fn_TK_save,
     cmp_sections
 ):
-    service_indicators_lst = [(2, 'Частота', 'Усредненная частота предоставления', 'Среднее'),
+    service_indicators_lst = [(2, 'Частота', 'Усредненная частота предоставления', 'Сумма'),
                            (3, 'Кратность', 'Усредненная кратность применения', 'Среднее'),
-                           (4, 'УЕТ 1', 'УЕТ 1', 'Сумма'), 
+                           (4, 'УЕТ 1', 'УЕТ 1', 'Сумма'),
                            (5, 'УЕТ 2', 'УЕТ 2', 'Сумма')]
-    LP_indicators_lst = [(2, 'Частота', 'Усредненная частота предоставления', 'Среднее'),
+    LP_indicators_lst = [(2, 'Частота', 'Усредненная частота предоставления', 'Сумма'),
                            (3, 'Кратность', 'Усредненная кратность применения', 'Среднее'),
-                           (4, 'Количество', 'Кол-во', 'Сумма'), 
+                           (4, 'Количество', 'Кол-во', 'Сумма'),
                            ]
     diff_df_services_02 = []
     diff_LP_df_02 = []
@@ -1068,11 +1068,11 @@ def data_analysis_02_options(
                                             analysis_subpart_code, analysis_subpart,
                                             indicator_col_name = indicator_col_name,
                                             agg_type = agg_type,
-                                            )     
+                                            )
                                 )
             # update_excel_by_analysis(diff_df_services, diff_LP_df, path_tk_models_processed, tk_code_name, fn_TK_save )
     update_excel_by_analysis_02_options(diff_df_services_02, diff_LP_df_02, path_tk_models_processed, tk_code_name, fn_TK_save, cmp_sections )
-    
+
     return diff_df_services_02, diff_LP_df_02
 
 
@@ -1084,8 +1084,8 @@ def data_analysis_02_options(
 #     path_tk_models_processed,
 #     # first_model = 'База'
 # ):
-def total_comparsion_analysis_options(data_source_dir, fn_check_file1, fn_check_file2, 
-                                      df_services, df_LP, df_RM, 
+def total_comparsion_analysis_options(data_source_dir, fn_check_file1, fn_check_file2,
+                                      df_services, df_LP, df_RM,
                                       data_processed_dir, cmp_sections,
                                       profile='profile_test', tk_code='7777777', tk_name='tk_test',
                                       models= ['File_01', 'File_02']):
@@ -1093,8 +1093,8 @@ def total_comparsion_analysis_options(data_source_dir, fn_check_file1, fn_check_
     # tk_models = create_tk_models_dict(models, xls_files, tk_code, tk_name, profile, tk_models = {} )
     # models, xls_files = ['File_01', 'File_02'], [fn_check_file1, fn_check_file2,]
     xls_files = [fn_check_file1, fn_check_file2,]
-    tk_models = create_tk_models_dict(models, xls_files, profile=profile, tk_code=tk_code, tk_name=tk_name) 
-    
+    tk_models = create_tk_models_dict(models, xls_files, profile=profile, tk_code=tk_code, tk_name=tk_name)
+
     for tk_full_name, tk_dict in tk_models.items():
         tk_name_short = tk_dict.get('Наименование ТК (короткое)')
         tk_code = tk_dict.get('Код ТК')
@@ -1118,7 +1118,7 @@ def total_comparsion_analysis_options(data_source_dir, fn_check_file1, fn_check_
                 data_processed_dir, fn_TK_save,
                 cmp_sections
             )
-            
+
             data_analysis_02_options(
                 df_services, df_LP,
                 tk_names, model_names, tk_code_name,
@@ -1126,8 +1126,8 @@ def total_comparsion_analysis_options(data_source_dir, fn_check_file1, fn_check_
                 cmp_sections
             )
 
-def compare_tk_options( data_source_dir, data_processed_dir, supp_dict_dir, 
-                        fn_check_file1, fn_check_file2, 
+def compare_tk_options( data_source_dir, data_processed_dir, supp_dict_dir,
+                        fn_check_file1, fn_check_file2,
                         cmp_cols_file_01, cmp_cols_file_02,
                         fn_smnn_pickle, cmp_sections,
                         profile='profile_test', tk_code=7777777, tk_name='tk_test',
@@ -1139,7 +1139,7 @@ def compare_tk_options( data_source_dir, data_processed_dir, supp_dict_dir,
         sys.exit(2)
     # df_services, df_LP, df_RM = preprocess_tkbd_options(data_source_dir, fn_tk_bd, data_processed_dir, supp_dict_dir, fn_smnn_pickle)
     df_services, df_LP, df_RM = preprocess_tkbd_options(
-                data_source_dir, fn_check_file1, fn_check_file2, 
+                data_source_dir, fn_check_file1, fn_check_file2,
                 cmp_cols_file_01, cmp_cols_file_02,
                 data_processed_dir, supp_dict_dir,
                 fn_smnn_pickle,
