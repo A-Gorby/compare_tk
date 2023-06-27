@@ -914,6 +914,7 @@ def update_excel_by_analysis_02_options(
                     path_tk_models_processed, tk_code_name, 'img') + f"/{i_p+1:02d}_{analysis_part}_{analysis_subpart_code:02d}_{analysis_subpart}*.jpg")
                     # path_tk_models_processed, tk_code_name) + f"/{i_p+1:02d}_{analysis_part}_{analysis_subpart_code:02d}_{analysis_subpart}*.jpg")
                     # path_tk_models_processed, tk_code_name) + f"/{i_p+1:02d}_{analysis_part}_{i_sp:02d}_{analysis_subpart.replace(' ', '_')}*.jpg")
+                fn_img_lst = sorted(fn_img_lst)
                 print("fn_img_lst:", len(fn_img_lst), fn_img_lst)
                 sheet_name = analysis_part + '_Анализ_' + analysis_subpart #.replace(' ', '_')
                 sheet_names = wb.get_sheet_names()
