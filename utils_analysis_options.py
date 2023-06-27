@@ -846,6 +846,7 @@ def update_excel_by_analysis_options(diff_df_services, diff_LP_df, tk_save_dir, 
             fn_img_lst = glob.glob(os.path.join(
                 tk_save_dir, tk_code_name, 'img') + f"/{i_p+1:02d}_{analysis_part}_01_Состав_*.jpg")
                 # tk_save_dir, tk_code_name) + f"/{i_p+1:02d}_{analysis_part}_01_Состав_*.jpg")
+            fn_img_lst = sorted(fn_img_lst)
             print("fn_img_lst:", len(fn_img_lst), fn_img_lst)
             sheet_name = analysis_part + '_Анализ_Состав'
             sheet_names = wb.get_sheet_names()
